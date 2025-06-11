@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { RefreshCw } from 'lucide-react';
@@ -134,75 +133,109 @@ const Coprimes = () => {
   }, []);
 
   return (
-    <div className="bg-gray-100 p-8 w-[780px] overflow-auto">
-      <Card className="w-[748px] mx-auto shadow-md bg-white">
-        <div className="bg-sky-50 p-6 rounded-t-lg w-[748px]">
-          <h1 className="text-sky-900 text-2xl font-bold">Coprime Numbers</h1>
-          <p className="text-sky-800">Learn how to identify coprime numbers!</p>
-        </div>
+    <>
+      <style>{`
+        @property --r {
+          syntax: '<angle>';
+          inherits: false;
+          initial-value: 0deg;
+        }
 
-        <CardContent className="space-y-6 pt-6 w-[748px]">
-          <div className="bg-blue-50 p-4 rounded border border-blue-200">
-            <h2 className="text-blue-900 font-bold mb-2">What are Coprime Numbers?</h2>
-            <p className="text-blue-600">
-              Coprime numbers are two numbers that share no common factors other than 1. 
-              Coprime numbers can be prime numbers themselves, but do not have to be.
-              Practice identifying coprime numbers below!
-            </p>
+        .glow-button { 
+          min-width: auto; 
+          height: auto; 
+          position: relative; 
+          border-radius: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1;
+          transition: all .3s ease;
+          padding: 7px;
+        }
+
+        .glow-button::before {
+          content: "";
+          display: block;
+          position: absolute;
+          background: #fff;
+          inset: 2px;
+          border-radius: 4px;
+          z-index: -2;
+        }
+
+        .simple-glow {
+          background: conic-gradient(
+            from var(--r),
+            transparent 0%,
+            rgb(0, 255, 132) 2%,
+            rgb(0, 214, 111) 8%,
+            rgb(0, 174, 90) 12%,
+            rgb(0, 133, 69) 14%,
+            transparent 15%
+          );
+          animation: rotating 3s linear infinite;
+          transition: animation 0.3s ease;
+        }
+
+        .simple-glow.stopped {
+          animation: none;
+          background: none;
+        }
+
+        @keyframes rotating {
+          0% {
+            --r: 0deg;
+          }
+          100% {
+            --r: 360deg;
+          }
+        }
+      `}</style>
+      <div className="w-[500px] h-auto mx-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.05)] bg-white rounded-lg overflow-hidden">
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-[#5750E3] text-sm font-medium select-none">Coprime Numbers</h2>
           </div>
 
-          <Card className="border border-gray-200">
-            <CardContent className="space-y-4 pt-4 p-6">
-              <h3 className="font-semibold mb-2">Examples:</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="font-semibold">15 and 28 are coprime because they only have 1 as a common factor</p>
-                  <p className="text-sm text-gray-600">Factors of 15: 1, 3, 5, 15</p>
-                  <p className="text-sm text-gray-600">Factors of 28: 1, 2, 4, 7, 14, 28</p>
-                  <p className="text-sm text-green-600">Only common factor: 1</p>
-                </div>
-                <div>
-                  <p className="font-semibold">12 and 18 are not coprime because they have common factors other than 1</p>
-                  <p className="text-sm text-gray-600">Factors of 12: 1, 2, 3, 4, 6, 12</p>
-                  <p className="text-sm text-gray-600">Factors of 18: 1, 2, 3, 6, 9, 18</p>
-                  <p className="text-sm text-red-600">Common factors: 1, 2, 3, 6</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-purple-900 font-bold">Practice Time!</h2>
-              <Button 
-                onClick={generateNumbers}
-                className="bg-sky-500 hover:bg-sky-600 text-white px-4 flex items-center gap-2"
-              >
-                <RefreshCw className="w-4 h-4" />
-                New Numbers
-              </Button>
-            </div>
-
+          <div className="space-y-4">
             <div className="text-center text-2xl mb-4">
               <span className="font-mono">Are {num1} and {num2} coprime?</span>
             </div>
 
-            <Button 
-              onClick={() => setShowSteps(true)}
-              className="w-full bg-blue-950 hover:bg-blue-900 text-white py-3"
-            >
-              Solve Step by Step
-            </Button>
+            <div className="flex justify-between items-center">
+              <Button 
+                onClick={generateNumbers}
+                className="bg-[#008545] hover:bg-[#00703d] text-white px-4 flex items-center gap-2"
+              >
+                <RefreshCw className="w-4 h-4" />
+                New Numbers
+              </Button>
 
-            {showSteps && (
-              <div className="bg-purple-50 p-4 rounded-lg mt-4">
-                <p className="mb-4">1. What are the factors of {num1}?</p>
+              <div className={`glow-button ${!showSteps ? 'simple-glow' : 'simple-glow stopped'}`}>
+                <Button 
+                  onClick={() => setShowSteps(true)}
+                  className="bg-[#008545] hover:bg-[#00703d] text-white px-4"
+                >
+                  Solve Step by Step
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {showSteps && (
+          <div className="p-4 bg-gray-50">
+            <div className="space-y-4">
+              <div className="w-full p-2 mb-1 bg-white border border-[#5750E3]/30 rounded-md">
+                <p className="text-sm mb-2">1. What are the factors of {num1}?</p>
                 {completedSteps.step1 ? (
-                  <p className="text-green-600 font-bold mb-6">
+                  <p className="text-[#008545] font-medium">
                     {correctAnswers.factors1.join(', ')}
                   </p>
                 ) : (
-                  <div className="flex items-center gap-4 mb-6">
+                  <div className="flex items-center gap-4">
                     <Input 
                       type="text"
                       value={userAnswers.factors1}
@@ -211,145 +244,141 @@ const Coprimes = () => {
                         setHasError(prev => ({ ...prev, step1: false }));
                       }}
                       placeholder="e.g., 1, 2, 3"
-                      className={`flex-1 ${hasError.step1 ? 'border-red-500' : 'border-blue-300'}`}
+                      className={`flex-1 ${hasError.step1 ? 'border-yellow-500' : 'border-gray-300'}`}
                     />
-                    <div className="flex gap-4">
+                    <div className="flex gap-2">
                       <Button
                         onClick={() => checkAnswer(1, userAnswers.factors1)}
-                        className="bg-blue-400 hover:bg-blue-500"
+                        className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4"
                       >
                         Check
                       </Button>
                       <Button
                         onClick={() => skipStep(1)}
-                        className="bg-gray-400 hover:bg-gray-500 text-white"
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4"
                       >
                         Skip
                       </Button>
                     </div>
                   </div>
                 )}
-
-                {currentStep >= 2 && (
-                  <>
-                    <p className="mb-4">2. What are the factors of {num2}?</p>
-                    {completedSteps.step2 ? (
-                      <p className="text-green-600 font-bold mb-6">
-                        {correctAnswers.factors2.join(', ')}
-                      </p>
-                    ) : (
-                      <div className="flex items-center gap-4 mb-6">
-                        <Input 
-                          type="text"
-                          value={userAnswers.factors2}
-                          onChange={(e) => {
-                            setUserAnswers(prev => ({ ...prev, factors2: e.target.value }));
-                            setHasError(prev => ({ ...prev, step2: false }));
-                          }}
-                          placeholder="e.g., 1, 2, 3"
-                          className={`flex-1 ${hasError.step2 ? 'border-red-500' : 'border-blue-300'}`}
-                        />
-                        <div className="flex gap-4">
-                          <Button
-                            onClick={() => checkAnswer(2, userAnswers.factors2)}
-                            className="bg-blue-400 hover:bg-blue-500"
-                          >
-                            Check
-                          </Button>
-                          <Button
-                            onClick={() => skipStep(2)}
-                            className="bg-gray-400 hover:bg-gray-500 text-white"
-                          >
-                            Skip
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {currentStep >= 3 && (
-                  <>
-                    <p className="mb-4">3. What factors do they share?</p>
-                    {completedSteps.step3 ? (
-                      <p className="text-green-600 font-bold mb-6">
-                        {correctAnswers.sharedFactors.join(', ')}
-                      </p>
-                    ) : (
-                      <div className="flex items-center gap-4 mb-6">
-                        <Input 
-                          type="text"
-                          value={userAnswers.sharedFactors}
-                          onChange={(e) => {
-                            setUserAnswers(prev => ({ ...prev, sharedFactors: e.target.value }));
-                            setHasError(prev => ({ ...prev, step3: false }));
-                          }}
-                          placeholder="e.g., 1, 2, 3"
-                          className={`flex-1 ${hasError.step3 ? 'border-red-500' : 'border-blue-300'}`}
-                        />
-                        <div className="flex gap-4">
-                          <Button
-                            onClick={() => checkAnswer(3, userAnswers.sharedFactors)}
-                            className="bg-blue-400 hover:bg-blue-500"
-                          >
-                            Check
-                          </Button>
-                          <Button
-                            onClick={() => skipStep(3)}
-                            className="bg-gray-400 hover:bg-gray-500 text-white"
-                          >
-                            Skip
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {currentStep >= 4 && (
-                  <>
-                    <p className="mb-4">4. Are these numbers coprime?</p>
-                    {completedSteps.step4 ? (
-                      <>
-                        <p className="text-green-600 font-bold mb-6">
-                          {correctAnswers.isCoprime ? 'Yes, these numbers are coprime because they only have a common factor of 1!' : 'No, these numbers are not coprime because they have a common factor other than 1!'}
-                        </p>
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
-                          <h3 className="text-green-800 text-xl font-bold">Great Work!</h3>
-                          <p className="text-green-700">
-                            You've successfully identified whether these numbers are coprime!
-                          </p>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="flex gap-4">
-                          <Button
-                            onClick={() => checkAnswer(4, true)}
-                            className={`bg-blue-400 hover:bg-blue-500 w-32 ${hasError.step4 && correctAnswers.isCoprime === false ? 'border-2 border-red-500' : ''}`}
-                          >
-                            Yes
-                          </Button>
-                          <Button
-                            onClick={() => checkAnswer(4, false)}
-                            className={`bg-blue-400 hover:bg-blue-500 w-32 ${hasError.step4 && correctAnswers.isCoprime === true ? 'border-2 border-red-500' : ''}`}
-                          >
-                            No
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
               </div>
-            )}
+
+              {currentStep >= 2 && (
+                <div className="w-full p-2 mb-1 bg-white border border-[#5750E3]/30 rounded-md">
+                  <p className="text-sm mb-2">2. What are the factors of {num2}?</p>
+                  {completedSteps.step2 ? (
+                    <p className="text-[#008545] font-medium">
+                      {correctAnswers.factors2.join(', ')}
+                    </p>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                      <Input 
+                        type="text"
+                        value={userAnswers.factors2}
+                        onChange={(e) => {
+                          setUserAnswers(prev => ({ ...prev, factors2: e.target.value }));
+                          setHasError(prev => ({ ...prev, step2: false }));
+                        }}
+                        placeholder="e.g., 1, 2, 3"
+                        className={`flex-1 ${hasError.step2 ? 'border-yellow-500' : 'border-gray-300'}`}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => checkAnswer(2, userAnswers.factors2)}
+                          className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4"
+                        >
+                          Check
+                        </Button>
+                        <Button
+                          onClick={() => skipStep(2)}
+                          className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4"
+                        >
+                          Skip
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {currentStep >= 3 && (
+                <div className="w-full p-2 mb-1 bg-white border border-[#5750E3]/30 rounded-md">
+                  <p className="text-sm mb-2">3. What factors do they share?</p>
+                  {completedSteps.step3 ? (
+                    <p className="text-[#008545] font-medium">
+                      {correctAnswers.sharedFactors.join(', ')}
+                    </p>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                      <Input 
+                        type="text"
+                        value={userAnswers.sharedFactors}
+                        onChange={(e) => {
+                          setUserAnswers(prev => ({ ...prev, sharedFactors: e.target.value }));
+                          setHasError(prev => ({ ...prev, step3: false }));
+                        }}
+                        placeholder="e.g., 1, 2, 3"
+                        className={`flex-1 ${hasError.step3 ? 'border-yellow-500' : 'border-gray-300'}`}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => checkAnswer(3, userAnswers.sharedFactors)}
+                          className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4"
+                        >
+                          Check
+                        </Button>
+                        <Button
+                          onClick={() => skipStep(3)}
+                          className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4"
+                        >
+                          Skip
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {currentStep >= 4 && (
+                <div className="w-full p-2 mb-1 bg-white border border-[#5750E3]/30 rounded-md">
+                  <p className="text-sm mb-2">4. Are these numbers coprime?</p>
+                  {completedSteps.step4 ? (
+                    <p className="text-[#008545] font-medium">
+                      {correctAnswers.isCoprime ? 'Yes, these numbers are coprime because they only have a common factor of 1!' : 'No, these numbers are not coprime because they have a common factor other than 1!'}
+                    </p>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => checkAnswer(4, true)}
+                        className={`bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 ${hasError.step4 && correctAnswers.isCoprime === false ? 'border-2 border-yellow-500' : ''}`}
+                      >
+                        Yes
+                      </Button>
+                      <Button
+                        onClick={() => checkAnswer(4, false)}
+                        className={`bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 ${hasError.step4 && correctAnswers.isCoprime === true ? 'border-2 border-yellow-500' : ''}`}
+                      >
+                        No
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {completedSteps.step4 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
+                  <h3 className="text-green-800 text-xl font-bold">Great Work!</h3>
+                  <p className="text-green-700">
+                    You've successfully identified whether these numbers are coprime!
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </CardContent>
-      </Card>
-      <p className="text-center text-gray-600 mt-4">
-        Understanding coprime numbers is essential for working with fractions and more advanced math concepts!
-      </p>
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 
