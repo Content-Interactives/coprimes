@@ -225,7 +225,7 @@ const Coprimes = () => {
       <div className="w-[500px] h-auto mx-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.05)] bg-white rounded-lg overflow-hidden">
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[#5750E3] text-sm font-medium select-none">Coprime Numbers</h2>
+            <h2 className="text-[#5750E3] text-sm font-medium select-none">Coprime Number Explorer</h2>
           </div>
 
           <div className="space-y-4">
