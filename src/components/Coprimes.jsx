@@ -4,8 +4,8 @@ import { Input } from '../components/ui/input';
 import { RefreshCw } from 'lucide-react';
 
 const Coprimes = () => {
-  const [num1, setNum1] = useState(0);
-  const [num2, setNum2] = useState(0);
+  const [values, setValues] = useState({ value1: '', value2: '' });
+  const [currentNumbers, setCurrentNumbers] = useState({ num1: null, num2: null });
   const [currentStep, setCurrentStep] = useState(1);
   const [showSteps, setShowSteps] = useState(false);
   const [completedSteps, setCompletedSteps] = useState({
@@ -49,13 +49,46 @@ const Coprimes = () => {
     do {
       n2 = Math.floor(Math.random() * 20) + 1;
     } while (n2 === n1);
-    const f1 = getFactors(n1);
-    const f2 = getFactors(n2);
+    
+    setValues({ value1: n1.toString(), value2: n2.toString() });
+  };
+
+  const handleValueChange = (e, field) => {
+    const value = e.target.value;
+    // Remove any "e" or "-" characters
+    const sanitizedValue = value.replace(/[e-]/g, '');
+    setValues(prev => ({ ...prev, [field]: sanitizedValue }));
+  };
+
+  const validateInputs = () => {
+    const { value1, value2 } = values;
+    if (!value1 || !value2) {
+      return false;
+    }
+    const num1 = parseInt(value1);
+    const num2 = parseInt(value2);
+    if (isNaN(num1) || isNaN(num2)) {
+      return false;
+    }
+    if (num1 < 1 || num2 < 1) {
+      return false;
+    }
+    return true;
+  };
+
+  const calculateSteps = () => {
+    if (!validateInputs()) return;
+
+    const { value1, value2 } = values;
+    const num1 = parseInt(value1);
+    const num2 = parseInt(value2);
+    
+    setCurrentNumbers({ num1, num2 });
+    const f1 = getFactors(num1);
+    const f2 = getFactors(num2);
     const shared = f1.filter(f => f2.includes(f));
     const isCoprime = shared.length === 1 && shared[0] === 1;
     
-    setNum1(n1);
-    setNum2(n2);
     setCurrentStep(1);
     setCompletedSteps({
       step1: false,
@@ -81,7 +114,7 @@ const Coprimes = () => {
       sharedFactors: shared,
       isCoprime: isCoprime
     });
-    setShowSteps(false);
+    setShowSteps(true);
   };
 
   const checkAnswer = (step, answer) => {
@@ -127,10 +160,6 @@ const Coprimes = () => {
     setCompletedSteps(prev => ({ ...prev, [`step${step}`]: true }));
     setCurrentStep(step + 1);
   };
-
-  React.useEffect(() => {
-    generateNumbers();
-  }, []);
 
   return (
     <>
@@ -200,27 +229,50 @@ const Coprimes = () => {
           </div>
 
           <div className="space-y-4">
-            <div className="text-center text-2xl mb-4">
-              <span className="font-mono">Are {num1} and {num2} coprime?</span>
-            </div>
-
-            <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <input
+                  type="number"
+                  value={values.value1}
+                  onChange={(e) => handleValueChange(e, 'value1')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'e' || e.key === '-') {
+                      e.preventDefault();
+                    }
+                  }}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5750E3]"
+                  placeholder="First number"
+                />
+              </div>
+              <div className="flex-1">
+                <input
+                  type="number"
+                  value={values.value2}
+                  onChange={(e) => handleValueChange(e, 'value2')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'e' || e.key === '-') {
+                      e.preventDefault();
+                    }
+                  }}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5750E3]"
+                  placeholder="Second number"
+                />
+              </div>
               <Button 
                 onClick={generateNumbers}
-                className="bg-[#008545] hover:bg-[#00703d] text-white px-4 flex items-center gap-2"
+                className="bg-[#008545] hover:bg-[#00703d] text-white px-4 h-[42px]"
               >
-                <RefreshCw className="w-4 h-4" />
-                New Numbers
+                Random
               </Button>
+            </div>
 
-              <div className={`glow-button ${!showSteps ? 'simple-glow' : 'simple-glow stopped'}`}>
-                <Button 
-                  onClick={() => setShowSteps(true)}
-                  className="bg-[#008545] hover:bg-[#00703d] text-white px-4"
-                >
-                  Solve Step by Step
-                </Button>
-              </div>
+            <div className={`glow-button ${!showSteps ? 'simple-glow' : 'simple-glow stopped'}`}>
+              <button 
+                onClick={calculateSteps}
+                className="w-full bg-[#008545] hover:bg-[#00703d] text-white text-sm py-2 rounded"
+              >
+                Are They Coprime?
+              </button>
             </div>
           </div>
         </div>
@@ -229,13 +281,9 @@ const Coprimes = () => {
           <div className="p-4 bg-gray-50">
             <div className="space-y-4">
               <div className="w-full p-2 mb-1 bg-white border border-[#5750E3]/30 rounded-md">
-                <p className="text-sm mb-2">1. What are the factors of {num1}?</p>
-                {completedSteps.step1 ? (
-                  <p className="text-[#008545] font-medium">
-                    {correctAnswers.factors1.join(', ')}
-                  </p>
-                ) : (
-                  <div className="flex items-center gap-4">
+                <p className="text-sm mb-2">1. What are the factors of {currentNumbers.num1}?</p>
+                {!completedSteps.step1 ? (
+                  <div className="flex items-center space-x-1 mt-2">
                     <Input 
                       type="text"
                       value={userAnswers.factors1}
@@ -243,36 +291,45 @@ const Coprimes = () => {
                         setUserAnswers(prev => ({ ...prev, factors1: e.target.value }));
                         setHasError(prev => ({ ...prev, step1: false }));
                       }}
+                      onKeyDown={(e) => {
+                        // Allow: numbers, comma, space, backspace, delete, arrow keys
+                        if (!/[\d,\s]/.test(e.key) && 
+                            !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab'].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                       placeholder="e.g., 1, 2, 3"
-                      className={`flex-1 ${hasError.step1 ? 'border-yellow-500' : 'border-gray-300'}`}
+                      className={`w-full ${hasError.step1 ? 'border-yellow-500' : 'border-gray-300'}`}
                     />
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => checkAnswer(1, userAnswers.factors1)}
-                        className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4"
-                      >
-                        Check
-                      </Button>
-                      <Button
-                        onClick={() => skipStep(1)}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4"
-                      >
-                        Skip
-                      </Button>
+                    <div className="glow-button simple-glow">
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => checkAnswer(1, userAnswers.factors1)}
+                          className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 py-2 rounded-md min-w-[80px]"
+                        >
+                          Check
+                        </button>
+                        <button 
+                          onClick={() => skipStep(1)}
+                          className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded-md min-w-[80px]"
+                        >
+                          Skip
+                        </button>
+                      </div>
                     </div>
                   </div>
+                ) : (
+                  <p className="text-[#008545] font-medium">
+                    {correctAnswers.factors1.join(', ')}
+                  </p>
                 )}
               </div>
 
               {currentStep >= 2 && (
                 <div className="w-full p-2 mb-1 bg-white border border-[#5750E3]/30 rounded-md">
-                  <p className="text-sm mb-2">2. What are the factors of {num2}?</p>
-                  {completedSteps.step2 ? (
-                    <p className="text-[#008545] font-medium">
-                      {correctAnswers.factors2.join(', ')}
-                    </p>
-                  ) : (
-                    <div className="flex items-center gap-4">
+                  <p className="text-sm mb-2">2. What are the factors of {currentNumbers.num2}?</p>
+                  {!completedSteps.step2 ? (
+                    <div className="flex items-center space-x-1 mt-2">
                       <Input 
                         type="text"
                         value={userAnswers.factors2}
@@ -280,24 +337,37 @@ const Coprimes = () => {
                           setUserAnswers(prev => ({ ...prev, factors2: e.target.value }));
                           setHasError(prev => ({ ...prev, step2: false }));
                         }}
+                        onKeyDown={(e) => {
+                          // Allow: numbers, comma, space, backspace, delete, arrow keys
+                          if (!/[\d,\s]/.test(e.key) && 
+                              !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab'].includes(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
                         placeholder="e.g., 1, 2, 3"
-                        className={`flex-1 ${hasError.step2 ? 'border-yellow-500' : 'border-gray-300'}`}
+                        className={`w-full ${hasError.step2 ? 'border-yellow-500' : 'border-gray-300'}`}
                       />
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => checkAnswer(2, userAnswers.factors2)}
-                          className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4"
-                        >
-                          Check
-                        </Button>
-                        <Button
-                          onClick={() => skipStep(2)}
-                          className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4"
-                        >
-                          Skip
-                        </Button>
+                      <div className="glow-button simple-glow">
+                        <div className="flex gap-1">
+                          <button 
+                            onClick={() => checkAnswer(2, userAnswers.factors2)}
+                            className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 py-2 rounded-md min-w-[80px]"
+                          >
+                            Check
+                          </button>
+                          <button 
+                            onClick={() => skipStep(2)}
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded-md min-w-[80px]"
+                          >
+                            Skip
+                          </button>
+                        </div>
                       </div>
                     </div>
+                  ) : (
+                    <p className="text-[#008545] font-medium">
+                      {correctAnswers.factors2.join(', ')}
+                    </p>
                   )}
                 </div>
               )}
@@ -305,12 +375,8 @@ const Coprimes = () => {
               {currentStep >= 3 && (
                 <div className="w-full p-2 mb-1 bg-white border border-[#5750E3]/30 rounded-md">
                   <p className="text-sm mb-2">3. What factors do they share?</p>
-                  {completedSteps.step3 ? (
-                    <p className="text-[#008545] font-medium">
-                      {correctAnswers.sharedFactors.join(', ')}
-                    </p>
-                  ) : (
-                    <div className="flex items-center gap-4">
+                  {!completedSteps.step3 ? (
+                    <div className="flex items-center space-x-1 mt-2">
                       <Input 
                         type="text"
                         value={userAnswers.sharedFactors}
@@ -318,24 +384,37 @@ const Coprimes = () => {
                           setUserAnswers(prev => ({ ...prev, sharedFactors: e.target.value }));
                           setHasError(prev => ({ ...prev, step3: false }));
                         }}
+                        onKeyDown={(e) => {
+                          // Allow: numbers, comma, space, backspace, delete, arrow keys
+                          if (!/[\d,\s]/.test(e.key) && 
+                              !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab'].includes(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
                         placeholder="e.g., 1, 2, 3"
-                        className={`flex-1 ${hasError.step3 ? 'border-yellow-500' : 'border-gray-300'}`}
+                        className={`w-full ${hasError.step3 ? 'border-yellow-500' : 'border-gray-300'}`}
                       />
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => checkAnswer(3, userAnswers.sharedFactors)}
-                          className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4"
-                        >
-                          Check
-                        </Button>
-                        <Button
-                          onClick={() => skipStep(3)}
-                          className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4"
-                        >
-                          Skip
-                        </Button>
+                      <div className="glow-button simple-glow">
+                        <div className="flex gap-1">
+                          <button 
+                            onClick={() => checkAnswer(3, userAnswers.sharedFactors)}
+                            className="bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 py-2 rounded-md min-w-[80px]"
+                          >
+                            Check
+                          </button>
+                          <button 
+                            onClick={() => skipStep(3)}
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded-md min-w-[80px]"
+                          >
+                            Skip
+                          </button>
+                        </div>
                       </div>
                     </div>
+                  ) : (
+                    <p className="text-[#008545] font-medium">
+                      {correctAnswers.sharedFactors.join(', ')}
+                    </p>
                   )}
                 </div>
               )}
@@ -343,25 +422,29 @@ const Coprimes = () => {
               {currentStep >= 4 && (
                 <div className="w-full p-2 mb-1 bg-white border border-[#5750E3]/30 rounded-md">
                   <p className="text-sm mb-2">4. Are these numbers coprime?</p>
-                  {completedSteps.step4 ? (
+                  {!completedSteps.step4 ? (
+                    <div className="flex gap-2">
+                      <div className="glow-button simple-glow">
+                        <div className="flex gap-1">
+                          <button 
+                            onClick={() => checkAnswer(4, true)}
+                            className={`bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 py-2 rounded-md min-w-[80px] ${hasError.step4 && correctAnswers.isCoprime === false ? 'border-2 border-yellow-500' : ''}`}
+                          >
+                            Yes
+                          </button>
+                          <button 
+                            onClick={() => checkAnswer(4, false)}
+                            className={`bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 py-2 rounded-md min-w-[80px] ${hasError.step4 && correctAnswers.isCoprime === true ? 'border-2 border-yellow-500' : ''}`}
+                          >
+                            No
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
                     <p className="text-[#008545] font-medium">
                       {correctAnswers.isCoprime ? 'Yes, these numbers are coprime because they only have a common factor of 1!' : 'No, these numbers are not coprime because they have a common factor other than 1!'}
                     </p>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => checkAnswer(4, true)}
-                        className={`bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 ${hasError.step4 && correctAnswers.isCoprime === false ? 'border-2 border-yellow-500' : ''}`}
-                      >
-                        Yes
-                      </Button>
-                      <Button
-                        onClick={() => checkAnswer(4, false)}
-                        className={`bg-[#008545] hover:bg-[#00703d] text-white text-sm px-4 ${hasError.step4 && correctAnswers.isCoprime === true ? 'border-2 border-yellow-500' : ''}`}
-                      >
-                        No
-                      </Button>
-                    </div>
                   )}
                 </div>
               )}
